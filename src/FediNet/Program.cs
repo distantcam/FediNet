@@ -35,6 +35,7 @@ try
         app.UseSwaggerUI();
     }
     app.UseHttpsRedirection();
+    app.UseSerilogRequestLogging();
     app.MapControllers();
     app.Run();
 }
