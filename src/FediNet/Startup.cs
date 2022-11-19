@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using MediatR;
 
 namespace FediNet;
 
@@ -12,6 +11,6 @@ public static class Startup
         var coreAssembly = typeof(Startup).Assembly;
 
         services.AddValidatorsFromAssembly(coreAssembly);
-        services.AddMediatR(coreAssembly);
+        services.AddMediator();
     }
 }

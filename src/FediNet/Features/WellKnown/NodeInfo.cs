@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
@@ -13,13 +13,13 @@ public static partial class NodeInfo
     [AutoConstruct]
     public partial class Handler : IRequestHandler<Query, Response>
     {
-        public Task<Response> Handle(Query request, CancellationToken cancellationToken)
+        public ValueTask<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new Response(new[]
+            return ValueTask.FromResult(new Response(new[]
             {
-            new Link("http://nodeinfo.diaspora.software/ns/schema/2.0", "https://localhost/nodeinfo/2.0.json"),
-            new Link("http://nodeinfo.diaspora.software/ns/schema/2.1", "https://localhost/nodeinfo/2.1.json")
-        }));
+                new Link("http://nodeinfo.diaspora.software/ns/schema/2.0", "https://localhost/nodeinfo/2.0.json"),
+                new Link("http://nodeinfo.diaspora.software/ns/schema/2.1", "https://localhost/nodeinfo/2.1.json")
+            }));
         }
     }
 }

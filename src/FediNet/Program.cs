@@ -4,6 +4,7 @@ using FediNet;
 using FediNet.Extensions;
 using Serilog;
 
+#pragma warning disable RS0030 // Do not used banned APIs
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();

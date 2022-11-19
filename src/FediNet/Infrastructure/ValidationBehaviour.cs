@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using MediatR;
+using Mediator;
 
 namespace FediNet.Infrastructure;
 
@@ -8,11 +8,11 @@ public partial class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavio
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
     {
         if (!_validators.Any())
         {
-            return await next();
+            return await next(request, cancellationToken);
         }
 
         var context = new ValidationContext<TRequest>(request);
@@ -23,6 +23,6 @@ public partial class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavio
             throw new ValidationException(failures);
         }
 
-        return await next();
+        return await next(request, cancellationToken);
     }
 }

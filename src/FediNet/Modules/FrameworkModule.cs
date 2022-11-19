@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using FediNet.Infrastructure;
-using MediatR;
+using Mediator;
 
 namespace FediNet.Modules;
 
@@ -8,7 +8,8 @@ public class FrameworkModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterMediatorRequestHandlers(ThisAssembly);
+        // Register handlers
+        builder.RegisterAssemblyTypes(ThisAssembly).AsClosedTypesOf(typeof(IRequestHandler<,>));
 
         // Pipeline order
         builder.RegisterGeneric(typeof(LoggingBehaviour<,>)).AsImplementedInterfaces().InstancePerLifetimeScope();

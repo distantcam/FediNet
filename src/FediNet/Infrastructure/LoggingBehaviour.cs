@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using Mediator;
 
 namespace FediNet.Infrastructure;
 
@@ -11,13 +11,13 @@ public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
         _logger = loggerFactory.CreateLogger(nameof(FediNet) + ".Pipeline");
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
     {
         _logger.LogInformation("Handling request {requestType}", typeof(TRequest));
         _logger.LogDebug("Request {@request}", request);
         try
         {
-            var response = await next().ConfigureAwait(false);
+            var response = await next(request, cancellationToken);
             _logger.LogInformation("Handled response {responseType}", typeof(TResponse));
             _logger.LogDebug("Response {@response}", response);
             return response;
