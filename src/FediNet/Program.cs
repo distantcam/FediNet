@@ -1,7 +1,8 @@
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using FediNet;
 using FediNet.Extensions;
+using FediNet.Features.WellKnown;
+using FediNet.Infrastructure;
+using FluentValidation;
+using Mediator;
 using Serilog;
 
 #pragma warning disable RS0030 // Do not used banned APIs
@@ -15,21 +16,16 @@ try
 
     builder.AddSerilog();
 
-    builder.Services.AddControllers(options =>
-    {
-    });
+    builder.Services.AddMediator();
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-    Startup.ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
-
-    // Register our modules
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterAssemblyModules(typeof(Program).Assembly));
+    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
+    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
     var app = builder.Build();
-    // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
@@ -37,7 +33,9 @@ try
     }
     app.UseHttpsRedirection();
     app.UseSerilogRequestLogging();
-    app.MapControllers();
+
+    app.MapGetRequest<NodeInfo.Request>("/.well-known/nodeinfo");
+
     app.Run();
 }
 catch (Exception ex)

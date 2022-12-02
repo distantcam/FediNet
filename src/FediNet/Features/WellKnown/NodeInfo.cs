@@ -4,16 +4,16 @@ namespace FediNet.Features.WellKnown;
 
 public static partial class NodeInfo
 {
-    public record Query : IRequest<Response>;
+    public record Request : IRequest<Response>;
 
     public record Response(IEnumerable<Link> Links);
 
     public record Link(string Href, string Rel);
 
     [AutoConstruct]
-    public partial class Handler : IRequestHandler<Query, Response>
+    public partial class Handler : IRequestHandler<Request, Response>
     {
-        public ValueTask<Response> Handle(Query request, CancellationToken cancellationToken)
+        public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken)
         {
             return ValueTask.FromResult(new Response(new[]
             {
