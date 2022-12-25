@@ -5,17 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="ControllerUsings.txt" MMLib_TemplateType="ControllerUsings" />
     <AdditionalFiles Include="BannedSymbols.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="0.5.0">
+    <PackageReference Include="AutoCtor" Version="0.6.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.3.0" />
-    <PackageReference Include="Mediator.Abstractions" Version="1.0.5" />
-    <PackageReference Include="Mediator.SourceGenerator" Version="1.0.5">
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.4.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="2.0.29" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.0.29">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -23,9 +24,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+    <PackageReference Include="MMLib.MediatR.Generators" Version="1.1.0" />
+    <PackageReference Include="Scrutor" Version="4.2.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
