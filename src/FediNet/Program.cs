@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using FediNet.Extensions;
+using FediNet.Features.WellKnown;
 using FediNet.Infrastructure;
 using FluentValidation;
 using Mediator;
@@ -23,8 +26,15 @@ try
             .Enrich.FromLogContext();
     });
 
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+
     builder.Services.AddMediator();
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+    builder.Services.AddHttpContextAccessor();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
@@ -43,8 +53,6 @@ try
             .WithScopedLifetime()
     );
 
-    builder.Services.AddControllers();
-
     var app = builder.Build();
     if (app.Environment.IsDevelopment())
     {
@@ -54,7 +62,17 @@ try
     app.UseHttpsRedirection();
     app.UseSerilogRequestLogging();
 
-    app.MapControllers();
+    app.MediateGet<NodeInfo.Request>("/.well-known/nodeinfo");
+    app.MediateGet<NodeInfoV20.Request>("/nodeinfo/2.0.json")
+        .WithName("NodeInfoV2");
+    app.MediateGet<WebFinger.Request>("/.well-known/webfinger");
+
+    app.MapGet("/@{username}", (string username) => Results.NotFound())
+        .WithName("ProfilePage");
+    app.MapGet("/users/{username}", (string username) => Results.NotFound())
+        .WithName("UserPage");
+    app.MapGet("/authorize_interaction", (string uri) => Results.NotFound())
+        .WithName("subscribe");
 
     app.Run();
 }

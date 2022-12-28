@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AutoCtor;
+using FluentValidation;
 using Mediator;
 
 namespace FediNet.Infrastructure;

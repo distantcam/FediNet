@@ -1,14 +1,12 @@
 ﻿using System.Reflection;
+using AutoCtor;
 using FediNet.Infrastructure;
-using Mediator;
-using MMLib.MediatR.Generators.Controllers;
 
 namespace FediNet.Features.WellKnown;
 
 public static partial class NodeInfoV20
 {
-    [HttpGet("/nodeinfo/2.0.json", Controller = "WellKnown", From = From.Ignore)]
-    public record Request : IRequest<Response>;
+    public record Request : IHttpRequest;
 
     public record Response(string Version, Software Software, string[] Protocols, Services Services, bool OpenRegistrations, Usage Usage, Metadata Metadata);
 
@@ -23,16 +21,16 @@ public static partial class NodeInfoV20
     public record Metadata;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, Response>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
-        public override Response Handle(Request request, CancellationToken cancellationToken)
+        public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var assemblyName = Assembly.GetEntryAssembly()?.GetName();
             var software = assemblyName == null
                 ? new Software("fedinet", "0.0.0")
                 : new Software(assemblyName.Name?.ToLowerInvariant() ?? "fedinet", assemblyName.Version?.ToString(3) ?? "0.0.0");
 
-            return new Response(
+            var response = new Response(
                 "2.0",
                 software,
                 new[] { "activitypub" },
@@ -40,6 +38,8 @@ public static partial class NodeInfoV20
                 false,
                 new Usage(new UserCounts(0, 0, 0), 0, 0),
                 new Metadata());
+
+            return Results.Ok(response);
         }
     }
 }

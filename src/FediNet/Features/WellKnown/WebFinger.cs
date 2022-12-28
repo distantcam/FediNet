@@ -1,24 +1,43 @@
-﻿using FediNet.Infrastructure;
-using Mediator;
-using MMLib.MediatR.Generators.Controllers;
+﻿using System.Web;
+using AutoCtor;
+using FediNet.Infrastructure;
 
 namespace FediNet.Features.WellKnown;
 
 public static partial class WebFinger
 {
-    [HttpGet("/.well-known/webfinger", Controller = "WellKnown", From = From.Query)]
-    public record Request(string Resource) : IRequest<Response>;
+    public record Request(string Resource) : IHttpRequest;
 
-    public record Response(string Subject);
+    public record Response(string Subject, string[]? Aliases, Link[]? Links);
+
+    public record Link(string Rel, string? Type, string? Href, string? Template);
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, Response>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
-        public override Response Handle(Request request, CancellationToken cancellationToken)
+        private readonly LinkGenerator _linkGenerator;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var acct = new AcctUri(request.Resource);
 
-            return new(acct.ToString());
+            var httpContext = _httpContextAccessor.HttpContext!;
+
+            var profilePage = _linkGenerator.GetUriByName(httpContext, "ProfilePage", new { username = acct.User })!;
+            var userPage = _linkGenerator.GetUriByName(httpContext, "UserPage", new { username = acct.User })!;
+            var subscribeLink = HttpUtility.UrlDecode(_linkGenerator.GetUriByName(httpContext, "subscribe", new { uri = "{{uri}}" }));
+
+            var response = new Response(
+                acct.ToString(),
+                new[] { profilePage, userPage },
+                new[] {
+                    new Link("http://webfinger.net/rel/profile-page", "text/html", profilePage, null),
+                    new Link("self", "application/activity+json", userPage, null),
+                    new Link("http://ostatus.org/schema/1.0/subscribe", null, null, subscribeLink)
+                });
+
+            return Results.Ok(response);
         }
     }
 }
