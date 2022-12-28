@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <NoWarn>CS8618</NoWarn>
     <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
 
@@ -11,7 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="0.7.1" PrivateAssets="all" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="AutoCtor" Version="0.7.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.4.0" />
     <PackageReference Include="Mediator.Abstractions" Version="2.0.29" />
     <PackageReference Include="Mediator.SourceGenerator" Version="2.0.29" PrivateAssets="all" />
