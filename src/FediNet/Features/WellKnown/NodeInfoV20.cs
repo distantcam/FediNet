@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using AutoCtor;
+using EndpointConfigurator;
+using FediNet.Extensions;
 using FediNet.Infrastructure;
 
 namespace FediNet.Features.WellKnown;
@@ -21,8 +23,13 @@ public static partial class NodeInfoV20
     public record Metadata;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncHttpRequestHandler<Request>
     {
+        [EndpointConfig]
+        public static void Config(IEndpointRouteBuilder app) =>
+            app.MediateGet<Request>("/nodeinfo/2.0.json")
+                .WithName("NodeInfoV2");
+
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var assemblyName = Assembly.GetEntryAssembly()?.GetName();

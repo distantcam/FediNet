@@ -1,5 +1,7 @@
 ﻿using System.Web;
 using AutoCtor;
+using EndpointConfigurator;
+using FediNet.Extensions;
 using FediNet.Infrastructure;
 
 namespace FediNet.Features.WellKnown;
@@ -13,8 +15,12 @@ public static partial class WebFinger
     public record Link(string Rel, string? Type, string? Href, string? Template);
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncHttpRequestHandler<Request>
     {
+        [EndpointConfig]
+        public static void Config(IEndpointRouteBuilder app) =>
+            app.MediateGet<Request>("/.well-known/webfinger");
+
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _httpContextAccessor;
 

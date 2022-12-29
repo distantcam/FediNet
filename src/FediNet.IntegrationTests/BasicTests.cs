@@ -5,9 +5,9 @@ namespace FediNet.IntegrationTests;
 
 [AutoConstruct]
 [UsesVerify]
-public partial class BasicTests : IClassFixture<WebApplicationFactory<Program>>
+public partial class BasicTests : IClassFixture<WebApplicationFactory<IApiMarker>>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly WebApplicationFactory<IApiMarker> _factory;
 
     [Theory]
     [InlineData("/.well-known/nodeinfo")]

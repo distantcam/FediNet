@@ -1,4 +1,6 @@
 ﻿using AutoCtor;
+using EndpointConfigurator;
+using FediNet.Extensions;
 using FediNet.Infrastructure;
 
 namespace FediNet.Features.WellKnown;
@@ -12,8 +14,12 @@ public static partial class NodeInfo
     public record Link(string Href, string Rel);
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncHttpRequestHandler<Request>
     {
+        [EndpointConfig]
+        public static void Config(IEndpointRouteBuilder app) =>
+            app.MediateGet<Request>("/.well-known/nodeinfo");
+
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _httpContextAccessor;
 

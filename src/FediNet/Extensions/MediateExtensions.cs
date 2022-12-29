@@ -9,13 +9,23 @@ public static class MediateExtensions
         this IEndpointRouteBuilder app,
         string pattern) where TRequest : IHttpRequest
     {
-        return app.MapGet(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request));
+        var requestType = typeof(TRequest)!;
+        if (requestType.IsNested && requestType.DeclaringType != null)
+            requestType = requestType.DeclaringType;
+
+        return app.MapGet(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request))
+            .WithTags(requestType.Namespace?.Split('.').Last() ?? nameof(FediNet));
     }
 
     public static RouteHandlerBuilder MediatePost<TRequest>(
         this IEndpointRouteBuilder app,
         string pattern) where TRequest : IHttpRequest
     {
-        return app.MapPost(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request));
+        var requestType = typeof(TRequest)!;
+        if (requestType.IsNested && requestType.DeclaringType != null)
+            requestType = requestType.DeclaringType;
+
+        return app.MapPost(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request))
+            .WithTags(requestType.Namespace?.Split('.').Last() ?? nameof(FediNet));
     }
 }

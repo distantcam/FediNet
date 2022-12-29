@@ -22,3 +22,13 @@ public abstract class SyncRequestHandler<TRequest, TResponse> : IRequestHandler<
         return ValueTask.FromResult(Handle(request, cancellationToken));
     }
 }
+
+public abstract class SyncHttpRequestHandler<TRequest> : IHttpRequestHandler<TRequest>
+    where TRequest : IHttpRequest
+{
+    public abstract IResult Handle(TRequest request, CancellationToken cancellationToken);
+    ValueTask<IResult> IRequestHandler<TRequest, IResult>.Handle(TRequest request, CancellationToken cancellationToken)
+    {
+        return ValueTask.FromResult(Handle(request, cancellationToken));
+    }
+}

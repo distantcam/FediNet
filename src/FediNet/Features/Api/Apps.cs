@@ -8,7 +8,7 @@ public static partial class Apps
     public record Request : IHttpRequest;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncHttpRequestHandler<Request>
     {
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
