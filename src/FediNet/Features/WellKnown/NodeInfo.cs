@@ -2,6 +2,7 @@
 using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
+using FediNet.Services;
 
 namespace FediNet.Features.WellKnown;
 
@@ -20,15 +21,14 @@ public static partial class NodeInfo
         public static void Config(IEndpointRouteBuilder app) =>
             app.MediateGet<Request>("/.well-known/nodeinfo");
 
-        private readonly LinkGenerator _linkGenerator;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UriGenerator _uriGenerator;
 
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var response = new Response(new[]
             {
                 new Link("http://nodeinfo.diaspora.software/ns/schema/2.0",
-                _linkGenerator.GetUriByName(_httpContextAccessor.HttpContext!, "NodeInfoV2",null)!)
+                _uriGenerator.GetUriByName("NodeInfoV2", null)!)
             });
             return Results.Ok(response);
         }

@@ -1,8 +1,8 @@
-﻿using System.Web;
-using AutoCtor;
+﻿using AutoCtor;
 using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
+using FediNet.Services;
 
 namespace FediNet.Features.WellKnown;
 
@@ -19,28 +19,24 @@ public static partial class WebFinger
     {
         [EndpointConfig]
         public static void Config(IEndpointRouteBuilder app) =>
-            app.MediateGet<Request>("/.well-known/webfinger");
+            app.MediateGet<Request>("/.well-known/webfinger")
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status400BadRequest);
 
-        private readonly LinkGenerator _linkGenerator;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UriGenerator _uriGenerator;
 
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
-            var acct = new AcctUri(request.Resource);
+            if (!AcctUri.TryParse(request.Resource, out var acct))
+                return Results.BadRequest();
 
-            var httpContext = _httpContextAccessor.HttpContext!;
-
-            var profilePage = _linkGenerator.GetUriByName(httpContext, "ProfilePage", new { username = acct.User })!;
-            var userPage = _linkGenerator.GetUriByName(httpContext, "UserPage", new { username = acct.User })!;
-            var subscribeLink = HttpUtility.UrlDecode(_linkGenerator.GetUriByName(httpContext, "subscribe", new { uri = "{{uri}}" }));
+            var userPage = _uriGenerator.GetUriByName("UserPage", new { username = acct.User })!;
 
             var response = new Response(
                 acct.ToString(),
-                new[] { profilePage, userPage },
+                new[] { userPage },
                 new[] {
-                    new Link("http://webfinger.net/rel/profile-page", "text/html", profilePage, null),
-                    new Link("self", "application/activity+json", userPage, null),
-                    new Link("http://ostatus.org/schema/1.0/subscribe", null, null, subscribeLink)
+                    new Link("self", "application/activity+json", userPage, null)
                 });
 
             return Results.Ok(response);

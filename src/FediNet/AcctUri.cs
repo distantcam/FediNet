@@ -1,27 +1,33 @@
-﻿namespace FediNet;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public record AcctUri
+namespace FediNet;
+
+public record AcctUri(string User, string Host)
 {
-    public AcctUri(string acctString)
+    public static bool TryParse(string value, [MaybeNullWhen(false)] out AcctUri result)
     {
-        var uri = new Uri(acctString);
-        if (!uri.Scheme.Equals("acct", StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new Exception("Must be acct scheme.");
-        }
-        Scheme = uri.Scheme;
-        var split = uri.AbsolutePath.Split('@');
-        if (split.Length != 2)
-        {
-            throw new Exception("Invalid acct resource.");
-        }
-        User = split[0];
-        Host = split[0];
+        result = null;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        if (!value.StartsWith("acct:"))
+            return false;
+
+        var parts = value.Substring(5).Split('@');
+
+        if (parts.Length != 2)
+            return false;
+
+        var user = parts[0];
+        var host = parts[1];
+
+        if (string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(host))
+            return false;
+
+        result = new AcctUri(user, host);
+        return true;
     }
 
-    public string Scheme { get; }
-    public string User { get; }
-    public string Host { get; }
-
-    public override string ToString() => Scheme + ":" + User + "@" + Host;
+    public override string ToString() => "acct:" + User + "@" + Host;
 }

@@ -48,6 +48,7 @@ try
         // Register services
         .AddClasses(classes => classes.InNamespaces("FediNet.Services"))
             .AsImplementedInterfaces()
+            .AsSelf()
             .WithScopedLifetime()
     );
 
@@ -57,7 +58,10 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-    app.UseHttpsRedirection();
+    else
+    {
+        app.UseHttpsRedirection();
+    }
     app.UseSerilogRequestLogging();
 
     app.MapEndpoints();
