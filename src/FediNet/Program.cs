@@ -1,7 +1,9 @@
 using System.Text.Json.Serialization;
+using FediNet;
 using FediNet.Infrastructure;
 using FluentValidation;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 [assembly: MediatorOptions(ServiceLifetime = ServiceLifetime.Scoped)]
@@ -23,6 +25,21 @@ try
             .ReadFrom.Services(services)
             .Enrich.FromLogContext();
     });
+
+    var connectionString = builder.Configuration.GetConnectionString("FediNetDb");
+    if (string.IsNullOrEmpty(connectionString))
+        throw new Exception("Database connection string not set.");
+    if (builder.Environment.IsDevelopment())
+    {
+        var dbUpdater = new DatabaseUpgrader(connectionString);
+        dbUpdater.PerformUpgrade(create: true);
+    }
+    builder.Services
+        .AddDbContext<FediNetContext>(options => options
+            .UseSqlServer(connectionString, opts => opts
+                .MigrationsAssembly(typeof(FediNetContext).Assembly.FullName)),
+        optionsLifetime: ServiceLifetime.Singleton) // For scoped access use DbContext
+        .AddDbContextFactory<FediNetContext>(lifetime: ServiceLifetime.Singleton); // For singleton access use DbContextFactory
 
     builder.Services.ConfigureHttpJsonOptions(options =>
     {
@@ -68,17 +85,7 @@ try
 
     app.Run();
 }
-catch (Exception ex)
-{
-    var type = ex.GetType().Name;
-    if (type.Equals("StopTheHostException", StringComparison.Ordinal))
-    {
-        // see https://github.com/dotnet/runtime/issues/60600
-        throw;
-    }
-
-    Log.Fatal(ex, "An unhandled exception occured during bootstrapping");
-}
+catch (HostAbortedException) { /* EF Migrations */ }
 finally
 {
     Log.CloseAndFlush();
