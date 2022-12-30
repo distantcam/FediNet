@@ -17,7 +17,7 @@ public static partial class User
             .Produces<Actor>(StatusCodes.Status200OK)
             .WithName(nameof(User));
 
-    public record Request([FromHeader] string Accept, string Username) : IHttpRequest;
+    public record Request([FromHeader] string? Accept, string Username) : IHttpRequest;
 
     [AutoConstruct]
     public partial class Handler : SyncHttpRequestHandler<Request>
@@ -26,21 +26,23 @@ public static partial class User
 
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
-            if (!request.Accept.Split(',').Any(a => a.Trim().Equals("application/ld+json", StringComparison.InvariantCultureIgnoreCase)))
+            if (string.IsNullOrEmpty(request.Accept) || !request.Accept.Split(',')
+                .Any(a => a.Trim().Equals("application/ld+json", StringComparison.InvariantCultureIgnoreCase)))
                 return Results.BadRequest();
 
             var activity = new Actor
             {
-                Context = new StringActivityContext("https://www.w3.org/ns/activitystreams"),
+                Context = Constants.ActivityStreamsContext,
                 Id = _uriGenerator.GetCurrentUri(),
                 Type = "Person",
                 Inbox = _uriGenerator.GetUriByName(nameof(Inbox), new { username = request.Username })!,
                 Outbox = _uriGenerator.GetUriByName(nameof(Outbox), new { username = request.Username })!,
                 Name = request.Username,
-                PreferredUsername = request.Username // Needed to support mastodon
+                PreferredUsername = request.Username, // Needed to support mastodon
+                Url = _uriGenerator.GetUriByName(nameof(Profile), new { username = request.Username }) // Mastodon uses this for profile link
             };
 
-            return Results.Json(activity, contentType: "application/activity+json");
+            return Results.Extensions.JsonActivity(activity);
         }
     }
 }

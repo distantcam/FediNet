@@ -1,0 +1,18 @@
+﻿{
+  Version: 1.1,
+  Status: 200 OK,
+  Content: {
+    Headers: {
+      Content-Type: application/activity+json
+    },
+    Value: {
+      totalItems: 0,
+      first: https://host/users/test/outbox/0,
+      last: https://host/users/test/outbox/0,
+      @context: https://www.w3.org/ns/activitystreams,
+      id: https://host/users/test/outbox,
+      type: OrderedCollection
+    }
+  },
+  Request: http://localhost/users/test/outbox
+}

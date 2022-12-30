@@ -5,9 +5,10 @@ namespace FediNet.IntegrationTests;
 
 [AutoConstruct]
 [UsesVerify]
-public partial class BasicTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("Test Collection")]
+public partial class BasicTests
 {
-    private readonly CustomWebApplicationFactory _factory;
+    private readonly CustomApiFactory _factory;
 
     [Theory]
     [InlineData("/.well-known/nodeinfo")]

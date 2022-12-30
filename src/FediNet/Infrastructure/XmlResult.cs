@@ -3,37 +3,36 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace FediNet.Infrastructure;
 
-public class XmlResult<T> : IResult
+public class XmlResult<TValue> : IResult, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>, IContentTypeHttpResult
 {
-    private static readonly XmlSerializer _serializer = new(typeof(T));
+    private static readonly XmlSerializer _serializer = new(typeof(TValue));
 
-    private readonly T _result;
-    private readonly string _contentType;
-    private readonly int _statusCode;
-
-    public XmlResult(T result, string? contentType = null, int? statusCode = null)
+    public XmlResult(TValue? value, string? contentType = null, int? statusCode = null)
     {
-        _result = result;
-        _contentType = contentType ?? "application/xml";
-        _statusCode = statusCode ?? 200;
+        Value = value;
+        StatusCode = statusCode;
+        ContentType = contentType;
     }
+
+    public TValue? Value { get; }
+    object? IValueHttpResult.Value => Value;
+
+    public string? ContentType { get; }
+
+    public int? StatusCode { get; }
 
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+
         var ns = new XmlSerializerNamespaces();
         ns.Add("", "");
 
         using var ms = new FileBufferingWriteStream();
-        _serializer.Serialize(ms, _result, ns);
+        _serializer.Serialize(ms, Value, ns);
 
-        httpContext.Response.ContentType = _contentType;
-        httpContext.Response.StatusCode = _statusCode;
+        httpContext.Response.StatusCode = StatusCode ?? 200;
+        httpContext.Response.ContentType = ContentType ?? "application/xml";
         await ms.DrainBufferAsync(httpContext.Response.Body);
     }
-}
-
-public static class XmlResultExtensions
-{
-    public static IResult Xml<T>(this IResultExtensions _, T result, string? contentType = null, int? statusCode = null) =>
-        new XmlResult<T>(result, contentType, statusCode);
 }

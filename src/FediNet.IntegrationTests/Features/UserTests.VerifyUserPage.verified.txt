@@ -12,7 +12,8 @@
       @context: https://www.w3.org/ns/activitystreams,
       id: https://host/users/test,
       type: Person,
-      name: test
+      name: test,
+      url: https://host/@test
     }
   },
   Request: {

@@ -2,7 +2,12 @@
 
 namespace FediNet.IntegrationTests;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>
+[CollectionDefinition("Test Collection")]
+public class SharedTestCollection : ICollectionFixture<CustomApiFactory>
+{
+}
+
+public class CustomApiFactory : WebApplicationFactory<IApiMarker>
 {
     protected override IHost CreateHost(IHostBuilder builder)
     {
