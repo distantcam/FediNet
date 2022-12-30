@@ -82,6 +82,7 @@ public class SourceGenerator : IIncrementalGenerator
         source.AppendLine($"//------------------------------------------------------------------------------");
         source.AppendLine($"");
 
+        source.AppendLine("[System.Runtime.CompilerServices.CompilerGenerated]");
         source.AppendLine("public static class EndpointExtensions_" + Guid.NewGuid().ToString("N"));
         source.StartBlock();
         source.AppendLine("public static void MapEndpoints(this IEndpointRouteBuilder app)");

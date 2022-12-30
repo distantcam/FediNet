@@ -1,0 +1,24 @@
+﻿{
+  Version: 1.1,
+  Status: 200 OK,
+  Content: {
+    Headers: {
+      Content-Type: application/activity+json
+    },
+    Value: {
+      inbox: https://host/users/test/inbox,
+      outbox: https://host/users/test/outbox,
+      preferredUsername: test,
+      @context: https://www.w3.org/ns/activitystreams,
+      id: https://host/users/test,
+      type: Person,
+      name: test
+    }
+  },
+  Request: {
+    Uri: http://localhost/users/test,
+    Headers: {
+      Accept: application/ld+json
+    }
+  }
+}

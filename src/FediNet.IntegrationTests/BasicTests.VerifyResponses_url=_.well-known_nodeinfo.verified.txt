@@ -9,7 +9,7 @@
       links: [
         {
           href: http://nodeinfo.diaspora.software/ns/schema/2.0,
-          rel: http://localhost/nodeinfo/2.0.json
+          rel: https://host/nodeinfo/2.0.json
         }
       ]
     }

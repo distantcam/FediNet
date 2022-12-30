@@ -8,6 +8,11 @@ namespace FediNet.Features.WellKnown;
 
 public static partial class NodeInfoV20
 {
+    [EndpointConfig]
+    public static void Config(IEndpointRouteBuilder app) =>
+        app.MediateGet<Request>("/nodeinfo/2.0.json")
+            .WithName(nameof(NodeInfoV20));
+
     public record Request : IHttpRequest;
 
     public record Response(string Version, Software Software, string[] Protocols, Services Services, bool OpenRegistrations, Usage Usage, Metadata Metadata);
@@ -25,11 +30,6 @@ public static partial class NodeInfoV20
     [AutoConstruct]
     public partial class Handler : SyncHttpRequestHandler<Request>
     {
-        [EndpointConfig]
-        public static void Config(IEndpointRouteBuilder app) =>
-            app.MediateGet<Request>("/nodeinfo/2.0.json")
-                .WithName("NodeInfoV2");
-
         public override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var assemblyName = Assembly.GetEntryAssembly()?.GetName();
