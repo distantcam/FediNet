@@ -14,7 +14,7 @@ public partial class BasicTests
     [InlineData("/.well-known/nodeinfo")]
     [InlineData("/nodeinfo/2.0.json")]
     [InlineData("/.well-known/webfinger?resource=acct:test@host")]
-    [InlineData("/.well-known/host-meta", Skip = "Verify broken for content type")]
+    [InlineData("/.well-known/host-meta")]
     public async Task VerifyResponses(string url)
     {
         // Arrange
