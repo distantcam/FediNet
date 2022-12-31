@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FediNet.Infrastructure;
 using FluentValidation;
@@ -26,11 +27,20 @@ try
 
     builder.Services.ConfigureHttpJsonOptions(options =>
     {
+        options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
     builder.Services.AddMediator();
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+    builder.Services.AddHttpClient();
+
+    builder.Services.AddAuthentication(options => options.DefaultScheme = "Sig")
+        .AddScheme<HttpSignatureAuthenticationOptions, HttpSignatureAuthenticationHandler>("Sig", options => { });
+    builder.Services.AddAuthorization(
+        o => o.AddPolicy("Signed",
+        b => b.RequireClaim("signed", "true")));
 
     builder.Services.AddHttpContextAccessor();
 
@@ -63,6 +73,9 @@ try
         app.UseHttpsRedirection();
     }
     app.UseSerilogRequestLogging();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
 
     app.MapEndpoints();
 

@@ -6,6 +6,7 @@ public static partial class Inbox
 {
     [EndpointConfig]
     public static void Config(IEndpointRouteBuilder app) =>
-        app.MapGet("/users/{username}/inbox", () => Results.StatusCode(501))
+        app.MapPost("/users/{username}/inbox", () => Results.StatusCode(501))
+            .RequireAuthorization()
             .WithName(nameof(Inbox));
 }
