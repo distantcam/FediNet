@@ -12,6 +12,7 @@ public static partial class Outbox
     [EndpointConfig]
     public static void Config(IEndpointRouteBuilder app) =>
         app.MediateGet<Request>("/users/{username}/outbox")
+            .RequireAuthorization()
             .WithName(nameof(Outbox));
 
     public record Request(string Username) : IHttpRequest;

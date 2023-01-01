@@ -36,12 +36,13 @@ public partial class HttpSignatureAuthenticationHandler : AuthenticationHandler<
         using var reader = new StreamReader(Request.Body);
         var body = await reader.ReadToEndAsync();
 
-        if (!requestHeaders.TryGetValue("digest", out var digest) ||
+        if (requestHeaders.TryGetValue("digest", out var digest) &&
             !CheckDigest(digest, body))
             return AuthenticateResult.Fail("Bad digest");
 
-        if (!requestHeaders.TryGetValue("signature", out var signature) ||
-            !await CheckSignature(signature, body, Request.Method, Request.Path, Request.QueryString.ToString(), requestHeaders))
+        if (!requestHeaders.TryGetValue("signature", out var signature))
+            return AuthenticateResult.Fail("Missing signature");
+        if (!await CheckSignature(signature, Request.Method, Request.Path, Request.QueryString.ToString(), requestHeaders))
             return AuthenticateResult.Fail("Bad signature");
 
         var claims = new[] {
@@ -61,9 +62,9 @@ public partial class HttpSignatureAuthenticationHandler : AuthenticationHandler<
         return digestHash == calculatedDigestHash;
     }
 
-    private async Task<bool> CheckSignature(string signature, string body, string method, string path, string queryString, Dictionary<string, string> requestHeaders)
+    private async Task<bool> CheckSignature(string signature, string method, string path, string queryString, Dictionary<string, string> requestHeaders)
     {
-        var sigRegex = new Regex(@"^([a-zA-Z0-9]+)=""(.+)""$");
+        var sigRegex = SignatureRegex();
         var signatureHeaders = signature.Split(',')
             .Select(x => sigRegex.Match(x))
             .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
@@ -77,25 +78,25 @@ public partial class HttpSignatureAuthenticationHandler : AuthenticationHandler<
         if (actor.PublicKey == null)
             return false;
 
-        var toDecode = actor.PublicKey.PublicKeyPem.Trim().Remove(0, actor.PublicKey.PublicKeyPem.IndexOf('\n'));
-        toDecode = toDecode.Remove(toDecode.LastIndexOf('\n')).Replace("\n", "");
-        var signKey = ASN1.ToRSA(Convert.FromBase64String(toDecode));
+        var publicKeyPem = actor.PublicKey.PublicKeyPem;
 
         var toSign = string.Join('\n', headers.Split(' ')
             .Select(headerKey =>
             {
                 if (headerKey == "(request-target)")
                     return $"(request-target): {method.ToLower()} {path}{queryString}";
-                return $"{headerKey}: {string.Join(", ", requestHeaders[headerKey])}";
+                return $"{headerKey}: {requestHeaders[headerKey]}";
             }));
 
-        var key = new RSACryptoServiceProvider();
-        var rsaKeyInfo = key.ExportParameters(false);
-        rsaKeyInfo.Modulus = Convert.FromBase64String(toDecode);
-        key.ImportParameters(rsaKeyInfo);
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(publicKeyPem);
 
-        var result = signKey.VerifyData(Encoding.UTF8.GetBytes(toSign), sig, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        if (algorithm.Equals("rsa-sha256", StringComparison.InvariantCultureIgnoreCase))
+            return rsa.VerifyData(Encoding.UTF8.GetBytes(toSign), sig, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
-        return result;
+        return false;
     }
+
+    [GeneratedRegex("^([a-zA-Z0-9]+)=\"(.+)\"$")]
+    private static partial Regex SignatureRegex();
 }
