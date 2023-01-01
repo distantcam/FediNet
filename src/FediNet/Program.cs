@@ -60,6 +60,10 @@ try
             .AsImplementedInterfaces()
             .AsSelf()
             .WithScopedLifetime()
+        // Register caches
+        .AddClasses(classes => classes.InNamespaces("FediNet.Caching"))
+            .AsSelf()
+            .WithSingletonLifetime()
     );
 
     var app = builder.Build();
