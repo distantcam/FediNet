@@ -45,9 +45,8 @@ public partial class HttpSignatureAuthenticationHandler : AuthenticationHandler<
             !CheckDigest(digest, body))
             return AuthenticateResult.Fail("Bad digest");
 
-        if (!requestHeaders.TryGetValue("signature", out var signature))
-            return AuthenticateResult.Fail("Missing signature");
-        if (!await CheckSignature(signature, Request.Method, Request.Path, Request.QueryString.ToString(), requestHeaders))
+        if (requestHeaders.TryGetValue("signature", out var signature) &&
+            !await CheckSignature(signature, Request.Method, Request.Path, Request.QueryString.ToString(), requestHeaders))
             return AuthenticateResult.Fail("Bad signature");
 
         var claims = new[] {

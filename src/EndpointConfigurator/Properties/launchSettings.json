@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SourceGen": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\FediNet\\FediNet.csproj"
-    }
-  }
-}
