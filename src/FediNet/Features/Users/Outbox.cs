@@ -4,6 +4,7 @@ using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
 using FediNet.Services;
+using Mediator;
 
 namespace FediNet.Features.Users;
 
@@ -15,16 +16,16 @@ public static partial class Outbox
             .RequireAuthorization()
             .WithName(nameof(Outbox));
 
-    public record Request(string Username) : IHttpRequest;
+    public record Request(string Username) : IRequest<IResult>;
 
     public record Response;
 
     [AutoConstruct]
-    public partial class Handler : SyncHttpRequestHandler<Request>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
         private readonly UriGenerator _uriGenerator;
 
-        public override IResult Handle(Request request, CancellationToken cancellationToken)
+        protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var orderedCollection = new ActivityOrderedCollection
             {

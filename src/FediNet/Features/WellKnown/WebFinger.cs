@@ -5,6 +5,7 @@ using FediNet.Features.Users;
 using FediNet.Infrastructure;
 using FediNet.Models;
 using FediNet.Services;
+using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
@@ -17,16 +18,16 @@ public static partial class WebFinger
             .Produces(StatusCodes.Status404NotFound)
             .WithName(nameof(WebFinger));
 
-    public record Request(string Resource) : IHttpRequest;
+    public record Request(string Resource) : IRequest<IResult>;
 
     public record Response(string Subject, string[]? Aliases, Link[]? Links);
 
     [AutoConstruct]
-    public partial class Handler : SyncHttpRequestHandler<Request>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
         private readonly UriGenerator _uriGenerator;
 
-        public override IResult Handle(Request request, CancellationToken cancellationToken)
+        protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             if (!AcctUri.TryParse(request.Resource, out var acct))
                 return Results.NotFound();

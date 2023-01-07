@@ -1,5 +1,4 @@
-﻿using FediNet.Infrastructure;
-using Mediator;
+﻿using Mediator;
 
 namespace FediNet.Extensions;
 
@@ -7,7 +6,7 @@ public static class MediateExtensions
 {
     public static RouteHandlerBuilder MediateGet<TRequest>(
         this IEndpointRouteBuilder app,
-        string pattern) where TRequest : IHttpRequest
+        string pattern) where TRequest : IRequest<IResult>
     {
         var requestType = typeof(TRequest)!;
         if (requestType.IsNested && requestType.DeclaringType != null)
@@ -19,7 +18,7 @@ public static class MediateExtensions
 
     public static RouteHandlerBuilder MediatePost<TRequest>(
         this IEndpointRouteBuilder app,
-        string pattern) where TRequest : IHttpRequest
+        string pattern) where TRequest : IRequest<IResult>
     {
         var requestType = typeof(TRequest)!;
         if (requestType.IsNested && requestType.DeclaringType != null)

@@ -4,6 +4,7 @@ using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
 using FediNet.Services;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FediNet.Features.Users;
@@ -17,14 +18,14 @@ public static partial class User
             .Produces<Actor>(StatusCodes.Status200OK)
             .WithName(nameof(User));
 
-    public record Request([FromHeader] string? Accept, string Username) : IHttpRequest;
+    public record Request([FromHeader] string? Accept, string Username) : IRequest<IResult>;
 
     [AutoConstruct]
-    public partial class Handler : SyncHttpRequestHandler<Request>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
         private readonly UriGenerator _uriGenerator;
 
-        public override IResult Handle(Request request, CancellationToken cancellationToken)
+        protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.Accept) || !request.Accept.Split(',')
                 .Any(a => a.Trim().Equals("application/ld+json", StringComparison.InvariantCultureIgnoreCase)))

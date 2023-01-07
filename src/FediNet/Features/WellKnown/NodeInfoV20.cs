@@ -3,6 +3,7 @@ using AutoCtor;
 using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
+using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
@@ -13,7 +14,7 @@ public static partial class NodeInfoV20
         app.MediateGet<Request>("/nodeinfo/2.0.json")
             .WithName(nameof(NodeInfoV20));
 
-    public record Request : IHttpRequest;
+    public record Request : IRequest<IResult>;
 
     public record Response(string Version, Software Software, string[] Protocols, Services Services, bool OpenRegistrations, Usage Usage, Metadata Metadata);
 
@@ -28,9 +29,9 @@ public static partial class NodeInfoV20
     public record Metadata;
 
     [AutoConstruct]
-    public partial class Handler : SyncHttpRequestHandler<Request>
+    public partial class Handler : SyncRequestHandler<Request, IResult>
     {
-        public override IResult Handle(Request request, CancellationToken cancellationToken)
+        protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             var assemblyName = Assembly.GetEntryAssembly()?.GetName();
             var software = assemblyName == null
