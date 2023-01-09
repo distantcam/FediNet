@@ -1,5 +1,4 @@
 ﻿using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
@@ -8,13 +7,12 @@ using Mediator;
 
 namespace FediNet.Features.Users;
 
-public static partial class Outbox
+public partial class Outbox : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/users/{username}/outbox")
-            .RequireAuthorization()
-            .WithName(nameof(Outbox));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/users/{username}/outbox")
+        .RequireAuthorization()
+        .WithName(nameof(Outbox));
 
     public record Request(string Username) : IRequest<IResult>;
 
@@ -41,10 +39,9 @@ public static partial class Outbox
     }
 }
 
-public static partial class OutboxPage
+public partial class OutboxPage
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MapGet("/users/{username}/outbox/{page}", () => Results.StatusCode(501))
-            .WithName(nameof(OutboxPage));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MapGet("/users/{username}/outbox/{page}", () => Results.StatusCode(501))
+        .WithName(nameof(OutboxPage));
 }

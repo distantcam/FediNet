@@ -1,5 +1,4 @@
 ﻿using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Features.Users;
 using FediNet.Infrastructure;
@@ -9,14 +8,13 @@ using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public static partial class WebFinger
+public partial class WebFinger : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/.well-known/webfinger")
-            .Produces<Response>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .WithName(nameof(WebFinger));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/.well-known/webfinger")
+        .Produces<Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .WithName(nameof(WebFinger));
 
     public record Request(string Resource) : IRequest<IResult>;
 

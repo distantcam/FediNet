@@ -1,5 +1,4 @@
 ﻿using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Services;
@@ -7,11 +6,11 @@ using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public static partial class NodeInfo
+public partial class NodeInfo : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/.well-known/nodeinfo");
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/.well-known/nodeinfo")
+        .Produces<Response>(StatusCodes.Status200OK);
 
     public record Request : IRequest<IResult>;
 

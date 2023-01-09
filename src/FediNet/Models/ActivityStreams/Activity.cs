@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace FediNet.Models.ActivityStreams;
 
@@ -18,11 +19,11 @@ public record ActivityObject : IActivityObjectOrLink
     public string? Url { get; set; }
 
     [JsonExtensionData]
-    public IDictionary<string, object>? ExtraProperties { get; set; }
+    public IDictionary<string, JsonElement>? ExtraProperties { get; set; }
 }
 
 public record ActivityLink : IActivityObjectOrLink
 {
     [JsonExtensionData]
-    public IDictionary<string, object>? ExtraProperties { get; set; }
+    public IDictionary<string, JsonElement>? ExtraProperties { get; set; }
 }

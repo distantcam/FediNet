@@ -1,7 +1,6 @@
 ﻿using System.Web;
 using System.Xml.Serialization;
 using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Services;
@@ -9,12 +8,11 @@ using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public static partial class HostMeta
+public partial class HostMeta : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/.well-known/host-meta")
-            .Produces<Response>(StatusCodes.Status200OK, contentType: "application/xrd+xml");
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/.well-known/host-meta")
+        .Produces<Response>(StatusCodes.Status200OK, contentType: "application/xrd+xml");
 
     public record Request : IRequest<IResult>;
 

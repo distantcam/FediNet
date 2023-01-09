@@ -1,18 +1,17 @@
 ﻿using System.Reflection;
 using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public static partial class NodeInfoV20
+public partial class NodeInfoV20 : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/nodeinfo/2.0.json")
-            .WithName(nameof(NodeInfoV20));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/nodeinfo/2.0.json")
+        .Produces<Response>(StatusCodes.Status200OK)
+        .WithName(nameof(NodeInfoV20));
 
     public record Request : IRequest<IResult>;
 

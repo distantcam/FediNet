@@ -1,11 +1,10 @@
-﻿using EndpointConfigurator;
+﻿using FediNet.Infrastructure;
 
 namespace FediNet.Features.Users;
 
-public static partial class Profile
+public partial class Profile : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.Map("/@{username}", (string username) => Results.StatusCode(501))
-            .WithName(nameof(Profile));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .Map("/@{username}", (string username) => Results.StatusCode(501))
+        .WithName(nameof(Profile));
 }

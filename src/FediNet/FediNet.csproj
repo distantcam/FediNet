@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES;ENDPOINTCONFIG_EMBED_ATTRIBUTES</DefineConstants>
+    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
     <UserSecretsId>db9ca039-9b40-4193-9ee5-d5848a9b9104</UserSecretsId>
   </PropertyGroup>
 
@@ -12,10 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoCtor" Version="0.7.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="EndpointConfig" Version="0.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

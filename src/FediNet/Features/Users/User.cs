@@ -1,5 +1,4 @@
 ﻿using AutoCtor;
-using EndpointConfigurator;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
@@ -9,14 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FediNet.Features.Users;
 
-public static partial class User
+public partial class User : IEndpointDefinition
 {
-    [EndpointConfig]
-    public static void Config(IEndpointRouteBuilder app) =>
-        app.MediateGet<Request>("/users/{username}")
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces<Actor>(StatusCodes.Status200OK)
-            .WithName(nameof(User));
+    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
+        .MediateGet<Request>("/users/{username}")
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces<Actor>(StatusCodes.Status200OK)
+        .WithName(nameof(User));
 
     public record Request([FromHeader] string? Accept, string Username) : IRequest<IResult>;
 

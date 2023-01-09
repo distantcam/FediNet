@@ -31,28 +31,24 @@ try
         options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-    builder.Services.AddMediator();
-    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-    builder.Services.AddHttpClient();
-
     builder.Services.AddAuthentication(options => options.DefaultScheme = "Sig")
         .AddScheme<HttpSignatureAuthenticationOptions, HttpSignatureAuthenticationHandler>("Sig", options => { });
     builder.Services.AddAuthorization(
         o => o.AddPolicy("Signed",
         b => b.RequireClaim("signed", "true")));
 
-    builder.Services.AddHttpContextAccessor();
-
+    // OpenApi
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
         c.CustomSchemaIds(t => t.FullName?.Replace('+', '.'));
     });
 
-    // Set up pipeline
-    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
-    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+    // Services
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddHttpClient();
+    builder.Services.AddMediator();
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
     builder.Services.Scan(scan => scan.FromAssemblyOf<Program>()
         // Register services
@@ -65,6 +61,10 @@ try
             .AsSelf()
             .WithSingletonLifetime()
     );
+
+    // Set up pipeline
+    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
+    builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
     var app = builder.Build();
     if (app.Environment.IsDevelopment())
