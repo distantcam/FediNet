@@ -13,10 +13,10 @@ public partial class User : IEndpointDefinition
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/users/{username}")
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces<Actor>(StatusCodes.Status200OK)
+        .Produces<Actor>(StatusCodes.Status200OK, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"", "application/activity+json")
         .WithName(nameof(User));
 
-    public record Request([FromHeader] string? Accept, string Username) : IRequest<IResult>;
+    public record Request([FromHeader(Name = "accept")] string? Accept, string Username) : IRequest<IResult>;
 
     [AutoConstruct]
     public partial class Handler : SyncRequestHandler<Request, IResult>
@@ -25,8 +25,13 @@ public partial class User : IEndpointDefinition
 
         protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(request.Accept) || !request.Accept.Split(',')
-                .Any(a => a.Trim().Equals("application/ld+json", StringComparison.InvariantCultureIgnoreCase)))
+            var accepted = new[] {
+                "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+                "application/activity+json"
+            };
+
+            if (string.IsNullOrEmpty(request.Accept) ||
+                !request.Accept.Split(',').Select(a => a.Trim()).Intersect(accepted).Any())
                 return Results.BadRequest();
 
             var activity = new Actor
@@ -41,7 +46,7 @@ public partial class User : IEndpointDefinition
                 Url = _uriGenerator.GetUriByName(nameof(Profile), new { username = request.Username }) // Mastodon uses this for profile link
             };
 
-            return Results.Extensions.JsonActivity(activity);
+            return Results.Extensions.JsonActivity(activity, "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
         }
     }
 }

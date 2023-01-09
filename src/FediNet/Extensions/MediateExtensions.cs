@@ -12,7 +12,7 @@ public static class MediateExtensions
         if (requestType.IsNested && requestType.DeclaringType != null)
             requestType = requestType.DeclaringType;
 
-        return app.MapGet(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request))
+        return app.MapGet(pattern, (ISender sender, [AsParameters] TRequest request) => sender.Send(request))
             .WithTags(requestType.Namespace?.Split('.').Last() ?? nameof(FediNet));
     }
 
@@ -24,7 +24,7 @@ public static class MediateExtensions
         if (requestType.IsNested && requestType.DeclaringType != null)
             requestType = requestType.DeclaringType;
 
-        return app.MapPost(pattern, async (ISender sender, [AsParameters] TRequest request) => await sender.Send(request))
+        return app.MapPost(pattern, (ISender sender, [AsParameters] TRequest request) => sender.Send(request))
             .WithTags(requestType.Namespace?.Split('.').Last() ?? nameof(FediNet));
     }
 }

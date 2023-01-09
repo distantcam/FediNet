@@ -48,7 +48,7 @@ public partial class BasicTests
     {
         // Arrange
         var client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Add("Accept", "application/ld+json");
+        client.DefaultRequestHeaders.Add("Accept", "application/activity+json");
 
         // Act
         var response = await client.GetAsync("/users/test");

@@ -27,7 +27,7 @@ public partial class UriGenerator
     {
         (var scheme, var host) = GetCurrentContext();
 
-        return _linkGenerator.GetUriByName(endpointName, values, scheme, host) ?? throw new InvalidOperationException();
+        return _linkGenerator.GetUriByName(endpointName, values, scheme, host) ?? throw new ArgumentException(endpointName, nameof(endpointName));
     }
 
     public string GetCurrentUri()

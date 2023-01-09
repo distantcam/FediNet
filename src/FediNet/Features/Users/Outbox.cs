@@ -39,7 +39,7 @@ public partial class Outbox : IEndpointDefinition
     }
 }
 
-public partial class OutboxPage
+public partial class OutboxPage : IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MapGet("/users/{username}/outbox/{page}", () => Results.StatusCode(501))
