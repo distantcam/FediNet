@@ -71,12 +71,18 @@ try
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+
+        app.UseWebAssemblyDebugging();
     }
     else
     {
         app.UseHttpsRedirection();
     }
     app.UseSerilogRequestLogging();
+
+    app.UseBlazorFrameworkFiles();
+    app.UseStaticFiles();
+    app.MapFallbackToFile("index.html");
 
     app.UseAuthentication();
     app.UseAuthorization();

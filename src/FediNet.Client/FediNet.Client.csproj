@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CssFiles Include="**/*.css" Exclude="obj/**" />
+  </ItemGroup>
+
+  <Target Name="CheckForNpm">
+    <Exec Command="npm -v" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="You must install NPM to build this project" />
+  </Target>
+
+  <Target Name="ProcessStyles" DependsOnTargets="CheckForNpm" BeforeTargets="AssignTargetPaths">
+
+    <PropertyGroup>
+      <_StylesOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)styles'))/</_StylesOutputFullPath>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_StylesOutputFullPath)" />
+    <Exec Command="npx tailwindcss -i %(CssFiles.FullPath) -o $(_StylesOutputFullPath)%(CssFiles.Filename)%(CssFiles.Extension)" />
+
+    <ItemGroup>
+      <_StylesBuildOutput Include="$(IntermediateOutputPath)styles/**"></_StylesBuildOutput>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="DefineStyles" AfterTargets="ProcessStyles" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <StyleFiles Include="@(_StylesBuildOutput)">
+        <RelativePath>styles/%(Filename)%(Extension)</RelativePath>
+      </StyleFiles>
+    </ItemGroup>
+
+    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net7.0'"
+      CandidateAssets="@(StyleFiles)"
+      SourceId="$(PackageId)"
+      SourceType="Computed"
+      ContentRoot="$(_StylesOutputFullPath)"
+      BasePath="$(StaticWebAssetBasePath)"
+    >
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
+  </Target>
+
+</Project>
