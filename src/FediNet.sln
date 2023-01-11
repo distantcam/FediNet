@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.IntegrationTests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.Tests", "FediNet.Tests\FediNet.Tests.csproj", "{7F4141F9-0E45-4328-AAAF-9F3E8824A4D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FediNet.Client", "FediNet.Client\FediNet.Client.csproj", "{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.Client", "FediNet.Client\FediNet.Client.csproj", "{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
