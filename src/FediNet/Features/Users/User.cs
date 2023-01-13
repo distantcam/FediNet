@@ -13,7 +13,10 @@ public partial class User : IEndpointDefinition
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/users/{username}")
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces<Actor>(StatusCodes.Status200OK, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"", "application/activity+json")
+        .Produces<Actor>(
+            statusCode: StatusCodes.Status200OK,
+            contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+            additionalContentTypes: "application/activity+json")
         .WithName(nameof(User));
 
     public record Request([FromHeader(Name = "accept")] string? Accept, string Username) : IRequest<IResult>;
