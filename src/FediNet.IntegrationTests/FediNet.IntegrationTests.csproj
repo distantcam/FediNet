@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="0.7.1">
+    <PackageReference Include="AutoCtor" Version="0.8.0">
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <IncludeAssets>analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FluentAssert" Version="1.0.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.2" />

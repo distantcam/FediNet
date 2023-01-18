@@ -2,18 +2,17 @@
 using AutoCtor;
 using FediNet.Extensions;
 using FediNet.Infrastructure;
-using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public partial class NodeInfoV20 : IEndpointDefinition
+public partial class NodeInfoV20 : Feature, IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/nodeinfo/2.0.json")
         .Produces<Response>(StatusCodes.Status200OK)
         .WithName(nameof(NodeInfoV20));
 
-    public record Request : IRequest<IResult>;
+    public record Request : IFeatureRequest;
 
     public record Response(string Version, Software Software, string[] Protocols, Services Services, bool OpenRegistrations, Usage Usage, Metadata Metadata);
 
@@ -28,7 +27,7 @@ public partial class NodeInfoV20 : IEndpointDefinition
     public record Metadata;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncFeatureHandler<Request>
     {
         protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
@@ -46,7 +45,7 @@ public partial class NodeInfoV20 : IEndpointDefinition
                 new Usage(new UserCounts(0, 0, 0), 0, 0),
                 new Metadata());
 
-            return Results.Ok(response);
+            return TypedResults.Ok(response);
         }
     }
 }

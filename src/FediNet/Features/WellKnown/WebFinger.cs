@@ -4,11 +4,10 @@ using FediNet.Features.Users;
 using FediNet.Infrastructure;
 using FediNet.Models;
 using FediNet.Services;
-using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public partial class WebFinger : IEndpointDefinition
+public partial class WebFinger : Feature, IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/.well-known/webfinger")
@@ -16,19 +15,19 @@ public partial class WebFinger : IEndpointDefinition
         .Produces(StatusCodes.Status404NotFound)
         .WithName(nameof(WebFinger));
 
-    public record Request(string Resource) : IRequest<IResult>;
+    public record Request(string Resource) : IFeatureRequest;
 
     public record Response(string Subject, string[]? Aliases, Link[]? Links);
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncFeatureHandler<Request>
     {
         private readonly UriGenerator _uriGenerator;
 
         protected override IResult Handle(Request request, CancellationToken cancellationToken)
         {
             if (!AcctUri.TryParse(request.Resource, out var acct))
-                return Results.NotFound();
+                return TypedResults.NotFound();
 
             var userPage = _uriGenerator.GetUriByName(nameof(User), new { username = acct.User })!;
 
@@ -39,7 +38,7 @@ public partial class WebFinger : IEndpointDefinition
                     Link.Create("self", "application/activity+json", userPage)
                 });
 
-            return Results.Ok(response);
+            return TypedResults.Ok(response);
         }
     }
 }

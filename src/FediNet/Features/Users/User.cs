@@ -3,12 +3,11 @@ using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
 using FediNet.Services;
-using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FediNet.Features.Users;
 
-public partial class User : IEndpointDefinition
+public partial class User : Feature, IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/users/{username}")
@@ -19,10 +18,10 @@ public partial class User : IEndpointDefinition
             additionalContentTypes: "application/activity+json")
         .WithName(nameof(User));
 
-    public record Request([FromHeader(Name = "accept")] string? Accept, string Username) : IRequest<IResult>;
+    public record Request([FromHeader(Name = "accept")] string? Accept, string Username) : IFeatureRequest;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncFeatureHandler<Request>
     {
         private readonly UriGenerator _uriGenerator;
 
@@ -49,7 +48,7 @@ public partial class User : IEndpointDefinition
                 Url = _uriGenerator.GetUriByName(nameof(Profile), new { username = request.Username }) // Mastodon uses this for profile link
             };
 
-            return Results.Extensions.JsonActivity(activity, "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
+            return TypedResults.Json(activity, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
         }
     }
 }

@@ -2,24 +2,23 @@
 using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Services;
-using Mediator;
 
 namespace FediNet.Features.WellKnown;
 
-public partial class NodeInfo : IEndpointDefinition
+public partial class NodeInfo : Feature, IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/.well-known/nodeinfo")
         .Produces<Response>(StatusCodes.Status200OK);
 
-    public record Request : IRequest<IResult>;
+    public record Request : IFeatureRequest;
 
     public record Response(IEnumerable<Link> Links);
 
     public record Link(string Href, string Rel);
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncFeatureHandler<Request>
     {
         private readonly UriGenerator _uriGenerator;
 
@@ -30,7 +29,7 @@ public partial class NodeInfo : IEndpointDefinition
                 new Link("http://nodeinfo.diaspora.software/ns/schema/2.0",
                 _uriGenerator.GetUriByName(nameof(NodeInfoV20)))
             });
-            return Results.Ok(response);
+            return TypedResults.Ok(response);
         }
     }
 }

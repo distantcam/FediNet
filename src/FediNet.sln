@@ -14,8 +14,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.IntegrationTests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.Tests", "FediNet.Tests\FediNet.Tests.csproj", "{7F4141F9-0E45-4328-AAAF-9F3E8824A4D4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.Client", "FediNet.Client\FediNet.Client.csproj", "{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +32,6 @@ Global
 		{7F4141F9-0E45-4328-AAAF-9F3E8824A4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F4141F9-0E45-4328-AAAF-9F3E8824A4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F4141F9-0E45-4328-AAAF-9F3E8824A4D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD66BC57-4A1B-4590-AD82-84ECC7CFA74C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

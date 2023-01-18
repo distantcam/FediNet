@@ -4,8 +4,8 @@
         "FedNet": {
             "commandName": "Project",
             "dotnetRunMessages": true,
-            "launchBrowser": true,
-            "launchUrl": "",
+            "launchBrowser": false,
+            "launchUrl": "swagger",
             "applicationUrl": "https://localhost:7000;http://localhost:5000",
             "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
             "environmentVariables": {

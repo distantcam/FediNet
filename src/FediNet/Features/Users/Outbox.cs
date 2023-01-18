@@ -3,23 +3,22 @@ using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FediNet.Models.ActivityStreams;
 using FediNet.Services;
-using Mediator;
 
 namespace FediNet.Features.Users;
 
-public partial class Outbox : IEndpointDefinition
+public partial class Outbox : Feature, IEndpointDefinition
 {
     public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
         .MediateGet<Request>("/users/{username}/outbox")
         .RequireAuthorization()
         .WithName(nameof(Outbox));
 
-    public record Request(string Username) : IRequest<IResult>;
+    public record Request(string Username) : IFeatureRequest;
 
     public record Response;
 
     [AutoConstruct]
-    public partial class Handler : SyncRequestHandler<Request, IResult>
+    public partial class Handler : SyncFeatureHandler<Request>
     {
         private readonly UriGenerator _uriGenerator;
 
@@ -34,7 +33,7 @@ public partial class Outbox : IEndpointDefinition
                 Last = _uriGenerator.GetUriByName(nameof(OutboxPage), new { username = request.Username, page = 0 }),
                 TotalItems = 0
             };
-            return Results.Extensions.JsonActivity(orderedCollection);
+            return TypedResults.Json(orderedCollection, contentType: "application/activity+json");
         }
     }
 }

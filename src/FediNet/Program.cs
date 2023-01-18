@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FediNet.Extensions;
 using FediNet.Infrastructure;
 using FluentValidation;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 [assembly: MediatorOptions(ServiceLifetime = ServiceLifetime.Scoped)]
@@ -15,6 +17,10 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    var connectionString = builder.Configuration.GetConnectionString("FediNetDb");
+    if (string.IsNullOrEmpty(connectionString))
+        throw new Exception("Database connection string not set.");
 
     builder.Logging.ClearProviders();
     builder.Host.UseSerilog((context, services, loggerConfiguration) =>
@@ -31,12 +37,6 @@ try
         options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-    builder.Services.AddAuthentication(options => options.DefaultScheme = "Sig")
-        .AddScheme<HttpSignatureAuthenticationOptions, HttpSignatureAuthenticationHandler>("Sig", options => { });
-    builder.Services.AddAuthorization(
-        o => o.AddPolicy("Signed",
-        b => b.RequireClaim("signed", "true")));
-
     // OpenApi
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
@@ -44,7 +44,16 @@ try
         c.CustomSchemaIds(t => t.FullName?.Replace('+', '.'));
     });
 
+    // Database
+    //builder.Services
+    //    .AddDbContext<FediNetContext>(options => options
+    //        .UseSqlServer(connectionString, opts => opts
+    //            .MigrationsAssembly(typeof(FediNetContext).Assembly.FullName)),
+    //    optionsLifetime: ServiceLifetime.Singleton) // For scoped access use DbContext
+    //    .AddDbContextFactory<FediNetContext>(lifetime: ServiceLifetime.Singleton); // For singleton access use DbContextFactory
+
     // Services
+    builder.Services.AddBindingServices();
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddHttpClient();
     builder.Services.AddMediator();
@@ -72,7 +81,14 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseWebAssemblyDebugging();
+        // In development, create and migrate the database
+        //var dbOptions = app.Services.GetRequiredService<DbContextOptions>();
+        //new DbContext(dbOptions).Database.EnsureCreated();
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var db = scope.ServiceProvider.GetRequiredService<FediNetContext>();
+        //    db.Database.Migrate();
+        //}
     }
     else
     {
@@ -80,17 +96,11 @@ try
     }
     app.UseSerilogRequestLogging();
 
-    app.UseBlazorFrameworkFiles();
-    app.UseStaticFiles();
-    app.MapFallbackToFile("index.html");
-
-    app.UseAuthentication();
-    app.UseAuthorization();
-
     app.MapEndpoints();
 
     app.Run();
 }
+catch (HostAbortedException) { /* EF Migrations */ }
 finally
 {
     Log.CloseAndFlush();
