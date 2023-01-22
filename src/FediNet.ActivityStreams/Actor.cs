@@ -1,4 +1,4 @@
-﻿namespace FediNet.Models.ActivityStreams;
+﻿namespace FediNet.ActivityStreams;
 
 public record Actor : ActivityObject
 {
@@ -12,5 +12,3 @@ public record Actor : ActivityObject
     public PublicKey? PublicKey { get; init; }
 
 }
-
-public record PublicKey(string Id, string Owner, string PublicKeyPem);

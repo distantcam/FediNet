@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Extensions.Logging;
+﻿namespace FediNet.Infrastructure;
 
 public static class LoggerExtensions
 {

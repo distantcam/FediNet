@@ -1,54 +1,38 @@
-﻿using AutoCtor;
-using FediNet.Extensions;
+﻿using FediNet.ActivityStreams;
 using FediNet.Infrastructure;
-using FediNet.Models.ActivityStreams;
 using FediNet.Services;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.Users;
 
-public partial class User : Feature, IEndpointDefinition
+public class User : IEndpointGroupDefinition
 {
-    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
-        .MediateGet<Request>("/users/{username}")
-        .Produces(StatusCodes.Status400BadRequest)
-        .Produces<Actor>(
-            statusCode: StatusCodes.Status200OK,
-            contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-            additionalContentTypes: "application/activity+json")
-        .WithName(nameof(User));
+    public static void MapEndpoint(RouteGroupBuilder builder) => builder
+        .MapGet("/users/{username}", Handler);
 
-    public record Request([FromHeader(Name = "accept")] string? Accept, string Username) : IFeatureRequest;
-
-    [AutoConstruct]
-    public partial class Handler : SyncFeatureHandler<Request>
+    private static Results<JsonHttpResult<Actor>, BadRequest> Handler(/*[FromHeader(Name = "accept")] string? accept,*/ string username, UriGenerator _uriGenerator)
     {
-        private readonly UriGenerator _uriGenerator;
+        //var accepted = new[] {
+        //        "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+        //    "application/activity+json"
+        //};
 
-        protected override IResult Handle(Request request, CancellationToken cancellationToken)
+        //if (string.IsNullOrEmpty(accept) ||
+        //    !accept.Split(',').Select(a => a.Trim()).Intersect(accepted).Any())
+        //    return TypedResults.BadRequest();
+
+        var activity = new Actor
         {
-            var accepted = new[] {
-                "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-                "application/activity+json"
-            };
+            Context = "https://www.w3.org/ns/activitystreams",
+            Id = _uriGenerator.GetCurrentUri(),
+            Type = "Person",
+            Inbox = _uriGenerator.GetUriByName(nameof(Inbox), new { username })!,
+            Outbox = _uriGenerator.GetUriByName(nameof(Outbox), new { username })!,
+            Name = username,
+            PreferredUsername = username, // Needed to support mastodon
+            Url = _uriGenerator.GetUriByName(nameof(Profile), new { username }) // Mastodon uses this for profile link
+        };
 
-            if (string.IsNullOrEmpty(request.Accept) ||
-                !request.Accept.Split(',').Select(a => a.Trim()).Intersect(accepted).Any())
-                return Results.BadRequest();
-
-            var activity = new Actor
-            {
-                Context = Constants.ActivityStreamsContext,
-                Id = _uriGenerator.GetCurrentUri(),
-                Type = "Person",
-                Inbox = _uriGenerator.GetUriByName(nameof(Inbox), new { username = request.Username })!,
-                Outbox = _uriGenerator.GetUriByName(nameof(Outbox), new { username = request.Username })!,
-                Name = request.Username,
-                PreferredUsername = request.Username, // Needed to support mastodon
-                Url = _uriGenerator.GetUriByName(nameof(Profile), new { username = request.Username }) // Mastodon uses this for profile link
-            };
-
-            return TypedResults.Json(activity, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
-        }
+        return TypedResults.Json(activity, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
     }
 }

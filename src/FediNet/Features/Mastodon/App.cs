@@ -1,25 +1,24 @@
-﻿using FediNet.Extensions;
+﻿using System.Text.Json.Serialization;
 using FediNet.Infrastructure;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FediNet.Features.Mastodon;
 
-public partial class App : Feature, IEndpointDefinition
+public class App : IEndpointGroupDefinition
 {
-    public static void MapEndpoint(IEndpointRouteBuilder e) => e
-        .MediatePostBody<Request>("/api/v1/apps");
+    public static void MapEndpoint(RouteGroupBuilder builder) => builder
+        .MapPost("/api/v1/apps", Handler);
 
     public record Request(
-        string client_name,
-        string redirect_uris,
-        string? scopes,
-        string? website
-    ) : IFeatureRequest;
+        [property: JsonPropertyName("client_name")] string ClientName,
+        [property: JsonPropertyName("redirect_uris")] string RedirectUris,
+        string? Scopes,
+        string? Website
+    );
 
-    public partial class Handler : SyncFeatureHandler<Request>
+    private static StatusCodeHttpResult Handler([FromBody] Request request)
     {
-        protected override IResult Handle(Request request, CancellationToken cancellationToken)
-        {
-            return TypedResults.NotFound();
-        }
+        return TypedResults.StatusCode(501);
     }
 }

@@ -1,35 +1,23 @@
-﻿using AutoCtor;
-using FediNet.Extensions;
-using FediNet.Infrastructure;
+﻿using FediNet.ActivityStreams;
 using FediNet.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.WellKnown;
 
-public partial class NodeInfo : Feature, IEndpointDefinition
+public class NodeInfo : IEndpointGroupDefinition
 {
-    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
-        .MediateGet<Request>("/.well-known/nodeinfo")
-        .Produces<Response>(StatusCodes.Status200OK);
-
-    public record Request : IFeatureRequest;
+    public static void MapEndpoint(RouteGroupBuilder builder) => builder
+        .MapGet("/.well-known/nodeinfo", Handler);
 
     public record Response(IEnumerable<Link> Links);
 
-    public record Link(string Href, string Rel);
-
-    [AutoConstruct]
-    public partial class Handler : SyncFeatureHandler<Request>
+    private static Ok<Response> Handler(UriGenerator uriGenerator)
     {
-        private readonly UriGenerator _uriGenerator;
-
-        protected override IResult Handle(Request request, CancellationToken cancellationToken)
+        var response = new Response(new[]
         {
-            var response = new Response(new[]
-            {
-                new Link("http://nodeinfo.diaspora.software/ns/schema/2.0",
-                _uriGenerator.GetUriByName(nameof(NodeInfoV20)))
-            });
-            return TypedResults.Ok(response);
-        }
+            Link.Create("http://nodeinfo.diaspora.software/ns/schema/2.0",
+            uriGenerator.GetUriByName(nameof(NodeInfoV20)))
+        });
+        return TypedResults.Ok(response);
     }
 }

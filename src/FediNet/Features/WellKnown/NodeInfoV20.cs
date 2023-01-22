@@ -1,18 +1,12 @@
 ﻿using System.Reflection;
-using AutoCtor;
-using FediNet.Extensions;
-using FediNet.Infrastructure;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.WellKnown;
 
-public partial class NodeInfoV20 : Feature, IEndpointDefinition
+public class NodeInfoV20 : IEndpointGroupDefinition
 {
-    public static void MapEndpoint(IEndpointRouteBuilder builder) => builder
-        .MediateGet<Request>("/nodeinfo/2.0.json")
-        .Produces<Response>(StatusCodes.Status200OK)
-        .WithName(nameof(NodeInfoV20));
-
-    public record Request : IFeatureRequest;
+    public static void MapEndpoint(RouteGroupBuilder builder) => builder
+        .MapGet("/nodeinfo/2.0.json", Handler);
 
     public record Response(string Version, Software Software, string[] Protocols, Services Services, bool OpenRegistrations, Usage Usage, Metadata Metadata);
 
@@ -26,26 +20,22 @@ public partial class NodeInfoV20 : Feature, IEndpointDefinition
 
     public record Metadata;
 
-    [AutoConstruct]
-    public partial class Handler : SyncFeatureHandler<Request>
+    private static Ok<Response> Handler()
     {
-        protected override IResult Handle(Request request, CancellationToken cancellationToken)
-        {
-            var assemblyName = Assembly.GetEntryAssembly()?.GetName();
-            var software = assemblyName == null
-                ? new Software("fedinet", "0.0.0")
-                : new Software(assemblyName.Name?.ToLowerInvariant() ?? "fedinet", assemblyName.Version?.ToString(3) ?? "0.0.0");
+        var assemblyName = Assembly.GetEntryAssembly()?.GetName();
+        var software = assemblyName == null
+            ? new Software("fedinet", "0.0.0")
+            : new Software(assemblyName.Name?.ToLowerInvariant() ?? "fedinet", assemblyName.Version?.ToString(3) ?? "0.0.0");
 
-            var response = new Response(
-                "2.0",
-                software,
-                new[] { "activitypub" },
-                new Services(Array.Empty<string>(), Array.Empty<string>()),
-                false,
-                new Usage(new UserCounts(0, 0, 0), 0, 0),
-                new Metadata());
+        var response = new Response(
+            "2.0",
+            software,
+            new[] { "activitypub" },
+            new Services(Array.Empty<string>(), Array.Empty<string>()),
+            false,
+            new Usage(new UserCounts(0, 0, 0), 0, 0),
+            new Metadata());
 
-            return TypedResults.Ok(response);
-        }
+        return TypedResults.Ok(response);
     }
 }

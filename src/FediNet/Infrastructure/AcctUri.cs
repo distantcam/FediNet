@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace FediNet;
-
 public record AcctUri(string User, string Host)
 {
     public static bool TryParse(string value, [MaybeNullWhen(false)] out AcctUri result)
