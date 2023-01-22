@@ -1,6 +1,4 @@
-﻿using FediNet.ActivityStreams;
-using FediNet.Features.Users;
-using FediNet.Infrastructure;
+﻿using FediNet.Features.Users;
 using FediNet.Services;
 
 namespace FediNet.Features.WellKnown;

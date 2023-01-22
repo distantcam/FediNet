@@ -1,3 +1,4 @@
+using FediNet.ActivityStreams;
 using Serilog;
 
 #pragma warning disable RS0030 // Do not used banned APIs
@@ -26,6 +27,9 @@ try
         // Fixes schema ids for nested types
         c.CustomSchemaIds(t => t.FullName?.Replace('+', '.'));
     });
+
+    // JsonSerializer
+    builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.AddContext<ActivityStreamsJsonContext>());
 
     // Services
     builder.Services.AddHttpContextAccessor();

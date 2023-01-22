@@ -1,7 +1,26 @@
-﻿namespace FediNet.ActivityStreams;
+﻿using System.Text.Json.Serialization;
 
-public record Link(string Rel, string? Type, string? Href, string? Template)
+namespace FediNet.ActivityStreams;
+
+public record Link : IObjectOrLink
 {
-    public static Link Create(string rel, string type, string href) => new Link(rel, type, href, null);
-    public static Link Create(string href, string rel) => new Link(rel, null, href, null);
+    [JsonPropertyName("@context")]
+    public Context? Context { get; set; }
+
+    public string? Type { get; set; }
+
+    public string? Href { get; set; }
+    [JsonPropertyName("hreflang")] public string? HrefLang { get; set; }
+    public string? MediaType { get; set; }
+    public string? Name { get; set; }
+
+    public string? Rel { get; set; }
+}
+
+public readonly struct StringLink : IObjectOrLink
+{
+    public StringLink(string value) => Value = value;
+    public string Value { get; }
+    public static implicit operator string(StringLink link) => link.Value;
+    public static implicit operator StringLink(string value) => new(value);
 }

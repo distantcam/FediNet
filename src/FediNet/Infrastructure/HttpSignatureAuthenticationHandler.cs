@@ -103,7 +103,8 @@ public partial class HttpSignatureAuthenticationHandler : AuthenticationHandler<
 
     private async Task<string> GetPublicKeyPemFromActor(string actorId)
     {
-        return (await _actorHelper.GetActor(actorId)).PublicKey!.PublicKeyPem;
+        throw new NotImplementedException();
+        //return (await _actorHelper.GetActor(actorId)).PublicKey!.PublicKeyPem;
     }
 
     private bool VerifySignature(string publicKeyPem, string algorithm, byte[] toSign, byte[] sig)

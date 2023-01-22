@@ -3,11 +3,31 @@ using System.Text.Json.Serialization;
 
 namespace FediNet.ActivityStreams;
 
-public class ActivityContextDiscriminator : JsonConverter<ActivityContext>
+[JsonConverter(typeof(ContextDiscriminator))]
+public abstract class Context
 {
-    public override bool CanConvert(Type typeToConvert) => typeof(ActivityContext).IsAssignableFrom(typeToConvert);
+    public static implicit operator Context(string context) => new StringActivityContext(context);
+}
 
-    public override ActivityContext? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+public class StringActivityContext : Context
+{
+    public StringActivityContext(string context) => Context = context;
+    public string Context { get; }
+    public static implicit operator string(StringActivityContext context) => context.Context;
+    public static implicit operator StringActivityContext(string context) => new(context);
+}
+
+public class ObjectActivityContext : Context
+{
+    [JsonExtensionData]
+    public IDictionary<string, object>? ExtraProperties { get; set; }
+}
+
+public class ContextDiscriminator : JsonConverter<Context>
+{
+    public override bool CanConvert(Type typeToConvert) => typeof(Context).IsAssignableFrom(typeToConvert);
+
+    public override Context? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.String)
         {
@@ -49,7 +69,7 @@ public class ActivityContextDiscriminator : JsonConverter<ActivityContext>
         return converter.Read(ref reader, typeof(ObjectActivityContext), options);
     }
 
-    public override void Write(Utf8JsonWriter writer, ActivityContext value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Context value, JsonSerializerOptions options)
     {
         if (value is StringActivityContext stringActivityContext)
         {
