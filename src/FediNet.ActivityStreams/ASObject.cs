@@ -12,4 +12,7 @@ public record ASObject : IObjectOrLink
     public string? Name { get; set; }
     public string? Url { get; set; }
     public string? Summary { get; set; }
+    public string? Content { get; set; }
+
+    public IObjectOrLink? Location { get; set; }
 }
