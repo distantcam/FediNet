@@ -15,6 +15,7 @@ namespace FediNet.ActivityStreams;
 [JsonSerializable(typeof(OrderedCollectionPage))]
 [JsonSerializable(typeof(Actor))]
 [JsonSerializable(typeof(StringLink))]
+[JsonSerializable(typeof(Question))]
 public partial class ActivityStreamsJsonContext : JsonSerializerContext
 {
 }
