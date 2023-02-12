@@ -8,7 +8,5 @@ namespace FediNet.ActivityStreams;
 [JsonConverter(typeof(ObjectOrLinkConverter))]
 public partial class ObjectOrLink : OneOfBase<ASObject, Link, List<ObjectOrLink>>
 {
-    public ObjectOrLink() : base(default)
-    {
-    }
+    internal ObjectOrLink() : base(default) { }
 }

@@ -24,5 +24,10 @@ namespace FediNet.ActivityStreams;
 
 [JsonSerializable(typeof(Activity))]
 [JsonSerializable(typeof(Actor))]
+
 [JsonSerializable(typeof(Question))]
+[JsonSerializable(typeof(Closed))]
+[JsonSerializable(typeof(DateTime))]
+[JsonSerializable(typeof(bool))]
+
 public partial class ActivityStreamsJsonContext : JsonSerializerContext { }

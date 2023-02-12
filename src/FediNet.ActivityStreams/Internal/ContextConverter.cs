@@ -12,7 +12,10 @@ internal class ContextConverter : JsonConverter<Context>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            return reader.GetString();
+            var s = reader.GetString();
+            if (!Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out _))
+                throw new JsonException($"'{s}' could not be parsed as a Uri.");
+            return s;
         }
         if (reader.TokenType == JsonTokenType.StartObject)
         {

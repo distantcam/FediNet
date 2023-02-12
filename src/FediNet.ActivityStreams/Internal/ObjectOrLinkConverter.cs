@@ -85,11 +85,14 @@ internal class ObjectOrLinkConverter : JsonConverter<ObjectOrLink>
 
     public override ObjectOrLink? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (JsonDocument.TryParseValue(ref reader, out JsonDocument? doc))
+        if (JsonDocument.TryParseValue(ref reader, out var doc))
         {
             if (doc.RootElement.ValueKind is JsonValueKind.String)
             {
-                return new Link(doc.RootElement.GetString());
+                var s = doc.RootElement.GetString();
+                if (!Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out _))
+                    throw new JsonException($"'{s}' could not be parsed as a Uri.");
+                return new Link(s);
             }
             else if (doc.RootElement.ValueKind is JsonValueKind.Array)
             {
@@ -110,9 +113,8 @@ internal class ObjectOrLinkConverter : JsonConverter<ObjectOrLink>
                 var result = doc.Deserialize(clrType, options);
                 return Cast(result);
             }
-            throw new JsonException("Unable to parse document.");
         }
-        throw new JsonException("Unable to read json.");
+        throw new JsonException("Unable to parse ObjectOrLink.");
     }
 
     public override void Write(Utf8JsonWriter writer, ObjectOrLink value, JsonSerializerOptions options)
