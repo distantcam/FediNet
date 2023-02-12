@@ -16,8 +16,8 @@ public class SerializationTests
     [MemberData(nameof(GetExamples))]
     public void RoundTripExamples(Example example)
     {
-        var obj = JsonSerializer.Deserialize(example.Json, ActivityStreamsJsonContext.Default.IObjectOrLink);
-        var outJson = JsonSerializer.Serialize(obj, ActivityStreamsJsonContext.Default.IObjectOrLink);
+        var obj = JsonSerializer.Deserialize(example.Json, ActivityStreamsJsonContext.Default.ObjectOrLink);
+        var outJson = JsonSerializer.Serialize(obj, ActivityStreamsJsonContext.Default.ObjectOrLink);
 
         var expected = JToken.Parse(example.Json);
         var actual = JToken.Parse(outJson);

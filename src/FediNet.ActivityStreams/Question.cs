@@ -2,6 +2,6 @@
 
 public record Question : Activity
 {
-    public IObjectOrLink? OneOf { get; set; }
-    public IObjectOrLink? AnyOf { get; set; }
+    public ObjectOrLink? OneOf { get; set; }
+    public ObjectOrLink? AnyOf { get; set; }
 }

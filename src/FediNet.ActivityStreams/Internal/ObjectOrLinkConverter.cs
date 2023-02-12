@@ -2,9 +2,9 @@
 using System.Text.Json.Serialization;
 using static System.Text.Json.JsonSerializer;
 
-namespace FediNet.ActivityStreams;
+namespace FediNet.ActivityStreams.Internal;
 
-internal class ObjectOrLinkDescriminator : JsonConverter<IObjectOrLink>
+internal class ObjectOrLinkConverter : JsonConverter<ObjectOrLink>
 {
     private static Dictionary<string, Type> TypeMap = new Dictionary<string, Type>()
     {
@@ -64,40 +64,6 @@ internal class ObjectOrLinkDescriminator : JsonConverter<IObjectOrLink>
         { "Question", typeof(Question) },
     };
 
-    public override IObjectOrLink? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (JsonDocument.TryParseValue(ref reader, out JsonDocument? doc))
-        {
-            if (doc.RootElement.ValueKind is JsonValueKind.String)
-            {
-                return new StringLink(doc.RootElement.GetString()!);
-            }
-            else if (doc.RootElement.ValueKind is JsonValueKind.Array)
-            {
-                var items = doc.RootElement.EnumerateArray().Select(element =>
-                {
-                    if (!element.TryGetProperty("type", out var type))
-                    {
-                        throw new JsonException("Missing type property on object");
-                    }
-                    var clrType = GetClrTypeFromObject(type);
-                    return (IObjectOrLink?)element.Deserialize(clrType, options);
-                });
-                return new ObjectOrLinkList(items);
-            }
-            else if (doc.RootElement.TryGetProperty("type", out var type))
-            {
-                var clrType = GetClrTypeFromObject(type);
-                return (IObjectOrLink?)doc.Deserialize(clrType, options);
-            }
-            else
-            {
-                throw new NotImplementedException("Unknown");
-            }
-        }
-        throw new JsonException("Unable to read json.");
-    }
-
     private Type GetClrTypeFromObject(JsonElement type)
     {
         var typeKey = type.GetString();
@@ -109,27 +75,52 @@ internal class ObjectOrLinkDescriminator : JsonConverter<IObjectOrLink>
         return clrType;
     }
 
-    public override void Write(Utf8JsonWriter writer, IObjectOrLink value, JsonSerializerOptions options)
+    private ObjectOrLink? Cast(object? o)
     {
-        if (value is Link link) writer.WriteRawValue(Serialize(link, options));
-        else if (value is Question question) writer.WriteRawValue(Serialize(question, options));
-        else if (value is Activity activity) writer.WriteRawValue(Serialize(activity, options));
-        else if (value is CollectionPage collectionPage) writer.WriteRawValue(Serialize(collectionPage, options));
-        else if (value is OrderedCollectionPage orderedCollectionPage) writer.WriteRawValue(Serialize(orderedCollectionPage, options));
-        else if (value is Collection collection) writer.WriteRawValue(Serialize(collection, options));
-        else if (value is OrderedCollection orderedCollection) writer.WriteRawValue(Serialize(orderedCollection, options));
-        else if (value is Actor actor) writer.WriteRawValue(Serialize(actor, options));
-        else if (value is ASObject obj) writer.WriteRawValue(Serialize(obj, options));
-        else if (value is StringLink slink) writer.WriteRawValue("\"" + slink.Value + "\"");
-        else if (value is ObjectOrLinkList list)
+        ArgumentNullException.ThrowIfNull(o);
+        if (o is ASObject obj) return obj;
+        if (o is Link link) return link;
+        throw new InvalidCastException($"Cannot cast {o.GetType()} to ObjectOrLink.");
+    }
+
+    public override ObjectOrLink? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (JsonDocument.TryParseValue(ref reader, out JsonDocument? doc))
         {
-            writer.WriteStartArray();
-            foreach (var item in list)
+            if (doc.RootElement.ValueKind is JsonValueKind.String)
             {
-                Write(writer, item, options);
+                return new Link(doc.RootElement.GetString());
             }
-            writer.WriteEndArray();
+            else if (doc.RootElement.ValueKind is JsonValueKind.Array)
+            {
+                return doc.RootElement.EnumerateArray().Select(element =>
+                {
+                    if (!element.TryGetProperty("type", out var type))
+                    {
+                        throw new JsonException("Missing type property on object");
+                    }
+                    var clrType = GetClrTypeFromObject(type);
+                    var result = element.Deserialize(clrType, options);
+                    return Cast(result);
+                }).ToList();
+            }
+            else if (doc.RootElement.TryGetProperty("type", out var type))
+            {
+                var clrType = GetClrTypeFromObject(type);
+                var result = doc.Deserialize(clrType, options);
+                return Cast(result);
+            }
+            throw new JsonException("Unable to parse document.");
         }
-        else throw new JsonException("Unknown type to write: " + value.GetType());
+        throw new JsonException("Unable to read json.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ObjectOrLink value, JsonSerializerOptions options)
+    {
+        value.Switch(
+            o => writer.WriteRawValue(Serialize(o, o.GetType(), options)),
+            o => writer.WriteRawValue(Serialize(o, options)),
+            o => writer.WriteRawValue(Serialize(o, options))
+        );
     }
 }

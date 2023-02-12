@@ -1,5 +1,6 @@
 ﻿using FediNet.Features.Users;
 using FediNet.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.WellKnown;
 
@@ -10,7 +11,7 @@ public class WebFinger : IEndpointGroupDefinition
 
     public record Response(string Subject, string[]? Aliases, Link[]? Links);
 
-    private static IResult Handler(UriGenerator uriGenerator, string resource)
+    private static Results<Ok<Response>, NotFound> Handler(UriGenerator uriGenerator, string resource)
     {
         if (!AcctUri.TryParse(resource, out var acct))
             return TypedResults.NotFound();

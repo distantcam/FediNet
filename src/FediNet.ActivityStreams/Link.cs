@@ -1,8 +1,14 @@
 ﻿using System.Text.Json.Serialization;
+using FediNet.ActivityStreams.Internal;
+using OneOf;
 
 namespace FediNet.ActivityStreams;
 
-public record Link : IObjectOrLink
+[GenerateOneOf]
+[JsonConverter(typeof(LinkConverter))]
+public partial class Link : OneOfBase<ObjectLink, string> { }
+
+public record ObjectLink
 {
     [JsonPropertyName("@context")]
     public Context? Context { get; set; }
@@ -15,12 +21,4 @@ public record Link : IObjectOrLink
     public string? Name { get; set; }
 
     public string? Rel { get; set; }
-}
-
-public readonly struct StringLink : IObjectOrLink
-{
-    public StringLink(string value) => Value = value;
-    public string Value { get; }
-    public static implicit operator string(StringLink link) => link.Value;
-    public static implicit operator StringLink(string value) => new(value);
 }

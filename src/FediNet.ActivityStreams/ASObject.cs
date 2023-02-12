@@ -2,7 +2,7 @@
 
 namespace FediNet.ActivityStreams;
 
-public record ASObject : IObjectOrLink
+public record ASObject
 {
     [JsonPropertyName("@context")]
     public Context? Context { get; set; }
@@ -14,5 +14,5 @@ public record ASObject : IObjectOrLink
     public string? Summary { get; set; }
     public string? Content { get; set; }
 
-    public IObjectOrLink? Location { get; set; }
+    public ObjectOrLink? Location { get; set; }
 }
