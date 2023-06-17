@@ -4,7 +4,7 @@ using static System.Text.Json.JsonSerializer;
 
 namespace FediNet.ActivityStreams.Internal;
 
-internal class ObjectOrLinkConverter : JsonConverter<ObjectOrLink>
+public class ObjectOrLinkConverter : JsonConverter<ObjectOrLink>
 {
     private static Dictionary<string, Type> TypeMap = new Dictionary<string, Type>()
     {

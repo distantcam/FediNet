@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BA7DA269
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FediNet.ActivityStreams.Tests", "FediNet.ActivityStreams.Tests\FediNet.ActivityStreams.Tests.csproj", "{D5C2522B-4C5B-4D0F-9222-78004A184898}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FediNet.ApiTests", "FediNet.ApiTests\FediNet.ApiTests.csproj", "{F3B4D50E-42B6-4FB5-B045-A41E391460B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,12 +36,17 @@ Global
 		{D5C2522B-4C5B-4D0F-9222-78004A184898}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C2522B-4C5B-4D0F-9222-78004A184898}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C2522B-4C5B-4D0F-9222-78004A184898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3B4D50E-42B6-4FB5-B045-A41E391460B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3B4D50E-42B6-4FB5-B045-A41E391460B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3B4D50E-42B6-4FB5-B045-A41E391460B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3B4D50E-42B6-4FB5-B045-A41E391460B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D5C2522B-4C5B-4D0F-9222-78004A184898} = {BA7DA269-E856-4A2F-A9A9-304404304E25}
+		{F3B4D50E-42B6-4FB5-B045-A41E391460B2} = {BA7DA269-E856-4A2F-A9A9-304404304E25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {274A09DC-F367-43C3-8552-12B809CB1854}

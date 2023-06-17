@@ -4,7 +4,7 @@ using static System.Text.Json.JsonSerializer;
 
 namespace FediNet.ActivityStreams.Internal;
 
-internal class ClosedConverter : JsonConverter<Closed>
+public class ClosedConverter : JsonConverter<Closed>
 {
     public override Closed? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

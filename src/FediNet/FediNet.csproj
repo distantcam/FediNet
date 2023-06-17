@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <DefineConstants>AUTOCTOR_EMBED_ATTRIBUTES</DefineConstants>
-    <UserSecretsId>db9ca039-9b40-4193-9ee5-d5848a9b9104</UserSecretsId>
+    <UserSecretsId>FediNet</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="0.8.0" PrivateAssets="true" IncludeAssets="analyzers" />
+    <PackageReference Include="AutoCtor" Version="1.1.1" PrivateAssets="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +25,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FediNet.ActivityStreams\FediNet.ActivityStreams.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FediNet.ApiTests" />
   </ItemGroup>
 
 </Project>

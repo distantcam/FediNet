@@ -4,7 +4,7 @@ using static System.Text.Json.JsonSerializer;
 
 namespace FediNet.ActivityStreams.Internal;
 
-internal class LinkConverter : JsonConverter<Link>
+public class LinkConverter : JsonConverter<Link>
 {
     public override Link? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

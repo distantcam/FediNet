@@ -4,7 +4,7 @@ using static System.Text.Json.JsonSerializer;
 
 namespace FediNet.ActivityStreams.Internal;
 
-internal class ContextConverter : JsonConverter<Context>
+public class ContextConverter : JsonConverter<Context>
 {
     public override bool CanConvert(Type typeToConvert) => typeof(Context).IsAssignableFrom(typeToConvert);
 

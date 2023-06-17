@@ -1,0 +1,33 @@
+﻿{
+  target: {
+    Version: 1.1,
+    Status: 200 OK,
+    Content: {
+      Headers: {
+        Content-Type: application/json; charset=utf-8
+      },
+      Value: {
+        subject: acct:test@localhost,
+        aliases: [
+          http://localhost/users/test
+        ],
+        links: [
+          {
+            rel: self,
+            type: application/activity+json,
+            href: http://localhost/users/test
+          }
+        ]
+      }
+    },
+    Request: {
+      Uri: {
+        Path: http://localhost/.well-known/webfinger,
+        Query: {
+          resource: acct:test@localhost
+        }
+      }
+    }
+  },
+  httpCalls: []
+}

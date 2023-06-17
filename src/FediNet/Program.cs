@@ -1,4 +1,4 @@
-using FediNet.ActivityStreams;
+using System.Text.Json.Serialization;
 using Serilog;
 
 #pragma warning disable RS0030 // Do not used banned APIs
@@ -29,7 +29,10 @@ try
     });
 
     // JsonSerializer
-    builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.AddContext<ActivityStreamsJsonContext>());
+    builder.Services.ConfigureHttpJsonOptions(o =>
+    {
+        o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
     // Services
     builder.Services.AddHttpContextAccessor();
