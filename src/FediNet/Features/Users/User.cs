@@ -1,5 +1,5 @@
-﻿using FediNet.ActivityStreams;
-using FediNet.Services;
+﻿using FediNet.Services;
+using KristofferStrube.ActivityStreams;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.Users;
@@ -8,24 +8,22 @@ public class User : IEndpointGroupDefinition
 {
     public static void MapEndpoint(RouteGroupBuilder builder) => builder
         .MapGet("/users/{username}", Handler)
-        .Produces<Actor>(200,
+        .Produces<Person>(200,
         "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
         "application/activity+json");
 
-    private static JsonHttpResult<Actor> Handler(string username, UriGenerator _uriGenerator)
+    private static JsonHttpResult<Person> Handler(string username, UriGenerator _uriGenerator)
     {
-        var activity = new Actor
+        var person = new Person
         {
-            Context = "https://www.w3.org/ns/activitystreams",
             Id = _uriGenerator.GetCurrentUri(),
-            Type = "Person",
-            //Inbox = _uriGenerator.GetUriByName(nameof(Inbox), new { username })!,
-            //Outbox = _uriGenerator.GetUriByName(nameof(Outbox), new { username })!,
-            Name = username,
-            //PreferredUsername = username, // Needed to support mastodon
-            Url = _uriGenerator.GetUriByName(nameof(Profile), new { username }) // Mastodon uses this for profile link
+            Name = new[] { username },
+            PreferredUsername = username, // Needed to support mastodon
+            Inbox = _uriGenerator.GetLinkByName(nameof(Inbox), new { username }),
+            Outbox = _uriGenerator.GetLinkByName(nameof(Outbox), new { username }),
+            Url = new[] { _uriGenerator.GetLinkByName(nameof(Profile), new { username }) } // Mastodon uses this for profile link
         };
 
-        return TypedResults.Json(activity, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
+        return TypedResults.Json(person, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
     }
 }

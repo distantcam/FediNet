@@ -1,4 +1,5 @@
 ﻿using AutoCtor;
+using KristofferStrube.ActivityStreams;
 
 namespace FediNet.Services;
 
@@ -22,6 +23,9 @@ public partial class UriGenerator
 
         return (scheme, host);
     }
+
+    public ILink GetLinkByName(string endpointName, object? values = null)
+        => new Link { Href = new Uri(GetUriByName(endpointName, values)) };
 
     public string GetUriByName(string endpointName, object? values = null)
     {

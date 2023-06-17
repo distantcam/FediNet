@@ -1,5 +1,4 @@
-﻿using FediNet.ActivityStreams;
-using FediNet.Services;
+﻿using FediNet.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.WellKnown;

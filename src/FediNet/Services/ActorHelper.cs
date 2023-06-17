@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using AutoCtor;
-using FediNet.ActivityStreams;
+using KristofferStrube.ActivityStreams;
 
 namespace FediNet.Services;
 
