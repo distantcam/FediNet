@@ -1,29 +1,42 @@
-﻿using FediNet.Services;
+﻿using AutoCtor;
+using FediNet.Services;
 using KristofferStrube.ActivityStreams;
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FediNet.Features.Users;
 
-public class User : IEndpointGroupDefinition
+public partial class User : IEndpointGroupDefinition
 {
     public static void MapEndpoint(RouteGroupBuilder builder) => builder
-        .MapGet("/users/{username}", Handler)
+        .SendGet<Request, Person, Ok<Person>>(
+            "/users/{username}",
+            (string username) => new Request(username),
+            response => TypedResults.Ok(response))
         .Produces<Person>(200,
-        "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
-        "application/activity+json");
+            "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"",
+            "application/activity+json");
 
-    private static JsonHttpResult<Person> Handler(string username, UriGenerator _uriGenerator)
+    public record Request(string Username) : IRequest<Person>;
+
+    [AutoConstruct]
+    public partial class Handler : SyncHandler<Request, Person>
     {
-        var person = new Person
-        {
-            Id = _uriGenerator.GetCurrentUri(),
-            Name = new[] { username },
-            PreferredUsername = username, // Needed to support mastodon
-            Inbox = _uriGenerator.GetLinkByName(nameof(Inbox), new { username }),
-            Outbox = _uriGenerator.GetLinkByName(nameof(Outbox), new { username }),
-            Url = new[] { _uriGenerator.GetLinkByName(nameof(Profile), new { username }) } // Mastodon uses this for profile link
-        };
+        private readonly UriGenerator _uriGenerator;
 
-        return TypedResults.Json(person, contentType: "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"");
+        protected override Person Handle(Request request)
+        {
+            var username = request.Username;
+            var person = new Person
+            {
+                Id = _uriGenerator.GetCurrentUri(),
+                Name = new[] { username },
+                PreferredUsername = username, // Needed to support mastodon
+                Inbox = _uriGenerator.GetLinkByName(nameof(Inbox), new { username }),
+                Outbox = _uriGenerator.GetLinkByName(nameof(Outbox), new { username }),
+                Url = new[] { _uriGenerator.GetLinkByName(nameof(Profile), new { username }) } // Mastodon uses this for profile link
+            };
+            return person;
+        }
     }
 }

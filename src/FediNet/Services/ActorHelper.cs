@@ -1,10 +1,12 @@
 ﻿using System.Text.Json;
 using AutoCtor;
+using Injectio.Attributes;
 using KristofferStrube.ActivityStreams;
 
 namespace FediNet.Services;
 
 [AutoConstruct]
+[RegisterSingleton]
 public partial class ActorHelper
 {
     private readonly IHttpClientFactory _httpClientFactory;

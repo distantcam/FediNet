@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using FediNet.Infrastructure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +15,7 @@ public class App : IEndpointGroupDefinition
         string? Scopes,
         string? Website
     );
+    public record Response;
 
     private static StatusCodeHttpResult Handler([FromBody] Request request)
     {

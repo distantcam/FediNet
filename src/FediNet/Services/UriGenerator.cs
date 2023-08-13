@@ -1,9 +1,11 @@
 ﻿using AutoCtor;
+using Injectio.Attributes;
 using KristofferStrube.ActivityStreams;
 
 namespace FediNet.Services;
 
 [AutoConstruct]
+[RegisterSingleton]
 public partial class UriGenerator
 {
     private readonly LinkGenerator _linkGenerator;

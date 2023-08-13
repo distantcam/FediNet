@@ -5,22 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="BannedSymbols.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="BannedSymbols.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AutoCtor" Version="1.1.1" PrivateAssets="true" />
-    <PackageReference Include="KristofferStrube.ActivityStreams" Version="0.2.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4">
+    <PackageReference Include="AutoCtor" Version="1.2.0" PrivateAssets="all" />
+    <PackageReference Include="Dunet" Version="1.8.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Scrutor" Version="4.2.1" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+    <PackageReference Include="Injectio" Version="2.6.2" />
+    <PackageReference Include="KristofferStrube.ActivityStreams" Version="0.2.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="2.1.5" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.1.5" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Riok.Mapperly" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
